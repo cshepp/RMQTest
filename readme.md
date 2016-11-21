@@ -4,6 +4,8 @@ RMQTest is a configurable command line utility for publishing test messages to R
 
 ### Usage
 
+Download the releases [here](https://github.com/cshepp/RMQTest/releases).
+
 Run the program using `rmqtest.exe` (or `./rmqtest` on linux). 
 
 If you do not specify any arguments, the program will attempt to load the configuation file from `./conf.json`.
@@ -25,7 +27,7 @@ The `connections` property of the config defines a set of RabbitMQ connections t
 This property should be an array of objects, where each object contains the following properties:
 
 - `name`: The display name of the connection
-- `hostname`: The hostname of the RabbitMQ server e.g., rabbitmq.example.command
+- `hostname`: The hostname of the RabbitMQ server e.g., rabbitmq.example.com
 - `user`: The user for authenticating with RabbitMQ e.g., guest
 - `password`: The password for the user specified above e.g., guest
 - `vhost`: The name of the vhost to connect to e.g., MyVhost
