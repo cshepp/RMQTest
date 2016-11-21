@@ -2,11 +2,13 @@ package main
 
 import "encoding/json"
 
+// Config represents the configuration data required by the program
 type Config struct {
 	Connections []Connection
 	Messages    []Message
 }
 
+// ParseConfig deserializes a JSON string into a Config type
 func ParseConfig(config string) (Config, error) {
 
 	conf := Config{}
