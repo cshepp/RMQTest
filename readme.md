@@ -45,4 +45,4 @@ A **Property** object should contain the following properties:
 
 - `name`: The name of the property
 - `dataType`: The type of the property (string|int)
-- `defaultValue`: The value to use when generating this property. This can be a literal value (which will appear in every generated message), or one of (`\_GENERATE\_STRING`, `\_GENERATE\_INT`), which will provide a random string or int.
+- `defaultValue`: The value to use when generating this property. This can be a literal value (which will appear in every generated message), or one of (`_GENERATE_STRING`, `_GENERATE_INT`), which will provide a random string or int.
