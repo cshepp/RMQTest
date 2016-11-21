@@ -7,14 +7,14 @@ type Config struct {
 	Messages    []Message
 }
 
-func ParseConfig(config string) Config {
+func ParseConfig(config string) (Config, error) {
 
 	conf := Config{}
 
 	err := json.Unmarshal([]byte(config), &conf)
 	if err != nil {
-		panic(err)
+		return Config{}, err
 	}
 
-	return conf
+	return conf, nil
 }
