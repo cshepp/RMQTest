@@ -51,6 +51,7 @@ func getGenerator(prop MessageProperty) func() interface{} {
 	}
 }
 
+// Adapted from http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
 func generateString() interface{} {
 	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b := make([]rune, 8)
