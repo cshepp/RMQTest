@@ -10,7 +10,7 @@ Run the program using `rmqtest.exe` (or `./rmqtest` on linux).
 
 If you do not specify any arguments, the program will attempt to load the configuation file from `./conf.json`.
 
-Optionally, you can pass a custom path to your configuration file e.g., `rmqtest.exe C:\myconf.json`.
+Optionally, you can pass a custom path to your configuration file e.g., `rmqtest.exe -config=mycustomconf.json`.
 
 See "Configuration" below for more details.
 
