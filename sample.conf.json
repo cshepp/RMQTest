@@ -2,7 +2,7 @@
     "connections": [
         {
             "name": "My Server",
-            "hostname": "amqp.example.com",
+            "hostname": "localhost",
             "user": "guest",
             "password": "guest",
             "vhost": "/"
