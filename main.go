@@ -2,88 +2,37 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/streadway/amqp"
 )
+
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
+var configfile = flag.String("config", "conf.json", "config file to load")
 
 func main() {
 
-	config := loadConfig()
+	flag.Parse()
 
+	config := loadConfig(*configfile)
 	connection := promptToSelectConnection(config.Connections)
-	connectionString := connection.GetConnectionString()
-
 	message := promptToSelectMessage(config.Messages)
-	messageContent := message.GenerateContent()
 
-	// Connect to RMQ
-	conn, err := amqp.Dial(connectionString)
+	err := PublishMessage(connection, message)
+
 	if err != nil {
-		fmt.Println("Error connecting to RabbitMQ")
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	defer conn.Close()
-
-	// Open a channel
-	ch, err := conn.Channel()
-	if err != nil {
-		fmt.Println("Error opening a channel")
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	defer ch.Close()
-
-	// Send a message
-	body, err := json.Marshal(&messageContent)
-	if err != nil {
-		fmt.Println("Error converting message to JSON")
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	err = ch.Publish(
-		message.Exchange,
-		message.RoutingKey,
-		false,
-		false,
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        body,
-		})
-
-	if err != nil {
-		fmt.Println("Error publishing message")
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	fmt.Println("SENT:")
-	fmt.Println(string(body))
-	fmt.Println("TO:")
-	fmt.Println(connection.Name)
 }
 
-func loadConfig() Config {
-	// get any args passed in
-	args := os.Args[1:]
-
-	// this is the default config file path
-	configPath := "conf.json"
-
-	// check to see if a custom config file path was specified
-	if len(args) == 1 {
-		configPath = args[0]
-	}
+func loadConfig(path string) Config {
 
 	// load contents of config file
-	b, err := ioutil.ReadFile(configPath)
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		fmt.Println("Error reading config file")
 		fmt.Println(err.Error())
