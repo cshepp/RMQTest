@@ -2,7 +2,7 @@
     "connections": [
         {
             "name": "My Server",
-            "hostname": "amqp.example.com",
+            "hostname": "localhost",
             "user": "guest",
             "password": "guest",
             "vhost": "/"
@@ -13,7 +13,8 @@
             "name": "MyMessage",
             "properties": [
                 { "Name": "PropertyA", "DataType": "string", "DefaultValue": "123456" },
-                { "Name": "PropertyB", "DataType": "string", "DefaultValue": "_GENERATE_STRING" }
+                { "Name": "PropertyB", "DataType": "string", "DefaultValue": "_GENERATE_STRING" },
+                { "Name": "PropertyC", "DataType": "int",    "DefaultValue": "_GENERATE_INT"}
             ],
             "exchange": "Test.MyMessage",
             "routingKey": "Test.MyMessage"

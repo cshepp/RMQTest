@@ -2,86 +2,51 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/streadway/amqp"
 )
+
+var configfile = flag.String("config", "conf.json", "config file to load")
 
 func main() {
 
-	config := loadConfig()
+	flag.Parse()
 
+	config := loadConfig(*configfile)
 	connection := promptToSelectConnection(config.Connections)
-	connectionString := connection.GetConnectionString()
-
 	message := promptToSelectMessage(config.Messages)
-	messageContent := message.GenerateContent()
 
-	// Connect to RMQ
-	conn, err := amqp.Dial(connectionString)
-	if err != nil {
-		panic(err)
-	}
-	defer conn.Close()
-
-	// Open a channel
-	ch, err := conn.Channel()
-	if err != nil {
-		panic(err)
-	}
-	defer ch.Close()
-
-	// Send a message
-	body, err := json.Marshal(&messageContent)
-	if err != nil {
-		panic(err)
-	}
-
-	err = ch.Publish(
-		message.Exchange,
-		message.RoutingKey,
-		false,
-		false,
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        body,
-		})
+	err := PublishMessage(connection, message)
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
-
-	fmt.Println("SENT:")
-	fmt.Println(string(body))
-	fmt.Println("TO:")
-	fmt.Println(connection.Name)
 }
 
-func loadConfig() Config {
-	// get any args passed in
-	args := os.Args[1:]
-
-	// this is the default config file path
-	configPath := "conf.json"
-
-	// check to see if a custom config file path was specified
-	if len(args) == 1 {
-		configPath = args[0]
-	}
+func loadConfig(path string) Config {
 
 	// load contents of config file
-	b, err := ioutil.ReadFile(configPath)
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic(err)
+		fmt.Println("Error reading config file")
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 
-	// return parsed config file
-	return ParseConfig(string(b))
+	// parse config file
+	config, err := ParseConfig(string(b))
+	if err != nil {
+		fmt.Println("Error parsing config file")
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	return config
 }
 
 func promptToSelectConnection(connections []Connection) Connection {
@@ -99,11 +64,13 @@ func promptToSelectConnection(connections []Connection) Connection {
 
 	i, err := strconv.Atoi(cleanedInput)
 	if err != nil {
-		panic(err)
+		fmt.Println("Invalid input")
+		return promptToSelectConnection(connections)
 	}
 
 	if i > len(connections) {
-		panic("Invalid number entered")
+		fmt.Println("Invalid input")
+		return promptToSelectConnection(connections)
 	}
 
 	return connections[i]
@@ -124,11 +91,13 @@ func promptToSelectMessage(messages []Message) Message {
 
 	i, err := strconv.Atoi(cleanedInput)
 	if err != nil {
-		panic(err)
+		fmt.Println("Invalid input")
+		return promptToSelectMessage(messages)
 	}
 
 	if i > len(messages) {
-		panic("Invalid number entered")
+		fmt.Println("Invalid input")
+		return promptToSelectMessage(messages)
 	}
 
 	return messages[i]
