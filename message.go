@@ -1,8 +1,9 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"math/rand"
-	"strconv"
 	"strings"
 )
 
@@ -21,25 +22,27 @@ type MessageProperty struct {
 	DefaultValue string
 }
 
-// MessageContent provides a dynamic structure for json-ifying messages
-type MessageContent map[string]string
+// GenerateContent returns a byte slice of the json-encoded message with dynamic properties
+func (m *Message) GenerateContent() ([]byte, error) {
 
-// GenerateContent returns a string of the json-encoded message with dynamic properties
-func (m *Message) GenerateContent() MessageContent {
-
-	data := make(MessageContent)
+	data := make(map[string]interface{})
 
 	for _, property := range m.Properties {
 		gen := getGenerator(property)
 		data[property.Name] = gen()
 	}
 
-	return data
+	json, err := json.Marshal(&data)
+	if err != nil {
+		return nil, errors.New("Error converting message to JSON : " + err.Error())
+	}
+
+	return json, nil
 }
 
-func getGenerator(prop MessageProperty) func() string {
+func getGenerator(prop MessageProperty) func() interface{} {
 	if !strings.HasPrefix(prop.DefaultValue, "_GENERATE") {
-		return func() string { return prop.DefaultValue }
+		return func() interface{} { return prop.DefaultValue }
 	}
 
 	switch prop.DefaultValue {
@@ -48,12 +51,12 @@ func getGenerator(prop MessageProperty) func() string {
 	case "_GENERATE_INT":
 		return generateInt
 	default:
-		return func() string { return "" }
+		return func() interface{} { return "" }
 	}
 }
 
 // Adapted from http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-func generateString() string {
+func generateString() interface{} {
 	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b := make([]rune, 8)
 	for i := range b {
@@ -62,7 +65,6 @@ func generateString() string {
 	return string(b)
 }
 
-func generateInt() string {
-	i := rand.Int()
-	return strconv.Itoa(i)
+func generateInt() interface{} {
+	return rand.Int31n(9999)
 }

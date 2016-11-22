@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -25,14 +24,12 @@ func PublishMessage(connection Connection, message Message) error {
 	}
 	defer ch.Close()
 
-	content := message.GenerateContent()
-
-	// Send a message
-	body, err := json.Marshal(&content)
+	content, err := message.GenerateContent()
 	if err != nil {
-		return errors.New("Error converting message to JSON : " + err.Error())
+		return err
 	}
 
+	// Send a message
 	err = ch.Publish(
 		message.Exchange,
 		message.RoutingKey,
@@ -40,7 +37,7 @@ func PublishMessage(connection Connection, message Message) error {
 		false,
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        body,
+			Body:        content,
 		})
 
 	if err != nil {
@@ -48,7 +45,7 @@ func PublishMessage(connection Connection, message Message) error {
 	}
 
 	fmt.Println("SENT:")
-	fmt.Println(string(body))
+	fmt.Println(string(content))
 	fmt.Println("TO:")
 	fmt.Println(connection.Name)
 
