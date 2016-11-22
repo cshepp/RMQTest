@@ -6,30 +6,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"runtime/pprof"
 	"strconv"
 	"strings"
 )
 
-var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 var configfile = flag.String("config", "conf.json", "config file to load")
 
 func main() {
 
 	flag.Parse()
-
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			fmt.Println("Could not create CPU profile : " + err.Error())
-			os.Exit(1)
-		}
-		if err := pprof.StartCPUProfile(f); err != nil {
-			fmt.Println("Could not start CPU profile : ", err.Error())
-			os.Exit(1)
-		}
-		defer pprof.StopCPUProfile()
-	}
 
 	config := loadConfig(*configfile)
 	connection := promptToSelectConnection(config.Connections)
