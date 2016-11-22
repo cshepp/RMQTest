@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"strconv"
 	"strings"
 )
 
@@ -21,12 +22,12 @@ type MessageProperty struct {
 }
 
 // MessageContent provides a dynamic structure for json-ifying messages
-type MessageContent map[string]interface{}
+type MessageContent map[string]string
 
 // GenerateContent returns a string of the json-encoded message with dynamic properties
 func (m *Message) GenerateContent() MessageContent {
 
-	data := make(map[string]interface{})
+	data := make(MessageContent)
 
 	for _, property := range m.Properties {
 		gen := getGenerator(property)
@@ -36,9 +37,9 @@ func (m *Message) GenerateContent() MessageContent {
 	return data
 }
 
-func getGenerator(prop MessageProperty) func() interface{} {
+func getGenerator(prop MessageProperty) func() string {
 	if !strings.HasPrefix(prop.DefaultValue, "_GENERATE") {
-		return func() interface{} { return prop.DefaultValue }
+		return func() string { return prop.DefaultValue }
 	}
 
 	switch prop.DefaultValue {
@@ -47,12 +48,12 @@ func getGenerator(prop MessageProperty) func() interface{} {
 	case "_GENERATE_INT":
 		return generateInt
 	default:
-		return func() interface{} { return "" }
+		return func() string { return "" }
 	}
 }
 
 // Adapted from http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
-func generateString() interface{} {
+func generateString() string {
 	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b := make([]rune, 8)
 	for i := range b {
@@ -61,6 +62,7 @@ func generateString() interface{} {
 	return string(b)
 }
 
-func generateInt() interface{} {
-	return rand.Int()
+func generateInt() string {
+	i := rand.Int()
+	return strconv.Itoa(i)
 }
