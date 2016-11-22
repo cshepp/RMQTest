@@ -13,7 +13,7 @@ func TestParseConfig(t *testing.T) {
 	}
 
 	configString := string(b)
-	result := ParseConfig(configString)
+	result, err := ParseConfig(configString)
 
 	if len(result.Connections) != 1 {
 		t.Error("Expected 1, got", len(result.Connections))

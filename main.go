@@ -25,21 +25,27 @@ func main() {
 	// Connect to RMQ
 	conn, err := amqp.Dial(connectionString)
 	if err != nil {
-		panic(err)
+		fmt.Println("Error connecting to RabbitMQ")
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 	defer conn.Close()
 
 	// Open a channel
 	ch, err := conn.Channel()
 	if err != nil {
-		panic(err)
+		fmt.Println("Error opening a channel")
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 	defer ch.Close()
 
 	// Send a message
 	body, err := json.Marshal(&messageContent)
 	if err != nil {
-		panic(err)
+		fmt.Println("Error converting message to JSON")
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 
 	err = ch.Publish(
@@ -53,7 +59,9 @@ func main() {
 		})
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Error publishing message")
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 
 	fmt.Println("SENT:")
@@ -77,11 +85,20 @@ func loadConfig() Config {
 	// load contents of config file
 	b, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		panic(err)
+		fmt.Println("Error reading config file")
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 
-	// return parsed config file
-	return ParseConfig(string(b))
+	// parse config file
+	config, err := ParseConfig(string(b))
+	if err != nil {
+		fmt.Println("Error parsing config file")
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	return config
 }
 
 func promptToSelectConnection(connections []Connection) Connection {
@@ -99,11 +116,13 @@ func promptToSelectConnection(connections []Connection) Connection {
 
 	i, err := strconv.Atoi(cleanedInput)
 	if err != nil {
-		panic(err)
+		fmt.Println("Invalid input")
+		return promptToSelectConnection(connections)
 	}
 
 	if i > len(connections) {
-		panic("Invalid number entered")
+		fmt.Println("Invalid input")
+		return promptToSelectConnection(connections)
 	}
 
 	return connections[i]
@@ -124,11 +143,13 @@ func promptToSelectMessage(messages []Message) Message {
 
 	i, err := strconv.Atoi(cleanedInput)
 	if err != nil {
-		panic(err)
+		fmt.Println("Invalid input")
+		return promptToSelectMessage(messages)
 	}
 
 	if i > len(messages) {
-		panic("Invalid number entered")
+		fmt.Println("Invalid input")
+		return promptToSelectMessage(messages)
 	}
 
 	return messages[i]

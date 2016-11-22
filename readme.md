@@ -1,10 +1,10 @@
-# RMQTest
+# rmqtest
 
-RMQTest is a configurable command line utility for publishing test messages to RabbitMQ.
+rmqtest is a configurable command line utility for publishing test messages to RabbitMQ.
 
 ### Usage
 
-Download the releases [here](https://github.com/cshepp/RMQTest/releases).
+Download the releases [here](https://github.com/cshepp/rmqtest/releases).
 
 Run the program using `rmqtest.exe` (or `./rmqtest` on linux). 
 
@@ -16,7 +16,7 @@ See "Configuration" below for more details.
 
 ### Configuration
 
-The configuration for RMQTest is specified in a .json file. See `sample.conf.json` for an example.
+The configuration for rmqtest is specified in a .json file. See `sample.conf.json` for an example.
 
 The configuration file has two root properties: `connections` and `messages`.
 
